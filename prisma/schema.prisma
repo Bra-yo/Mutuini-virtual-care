@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SYSTEM_ADMIN
+  HOSPITAL_MANAGER
+  VIRTUAL_CARE_COORDINATOR
+  CLINICIAN
+  CHP
+  HEALTH_RECORDS_OFFICER
+  PHARMACIST
+  RESEARCH_ME_OFFICER
+}
+
+enum PatientStatus {
+  PRE_ENROLLED
+  AWAITING_TAIFACARE_REGISTRATION
+  TAIFACARE_LINKED
+  SHA_LINKED
+  ACTIVE_VIRTUAL_CARE
+  INACTIVE
+  LOST_TO_FOLLOW_UP
+  EXITED_DECEASED
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum QueueStatus {
+  WAITING
+  ASSIGNED
+  IN_CONSULTATION
+  COMPLETED
+  REFERRED
+  NOT_REACHED
+  CANCELLED
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  EMERGENCY
+}
+
+enum ClinicianStatus {
+  AVAILABLE
+  BUSY
+  OFFLINE
+  ON_BREAK
+  ON_LEAVE
+  EMERGENCY_ONLY
+}
+
+model User {
+  id              String           @id @default(cuid())
+  name            String
+  email           String           @unique
+  phone           String?
+  passwordHash    String
+  role            UserRole
+  clinicianStatus ClinicianStatus?
+  isActive        Boolean          @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdPatients   Patient[]          @relation("PatientCreatedBy")
+  assignedQueue     QueueEntry[]       @relation("AssignedClinician")
+  coordinatedQueue  QueueEntry[]       @relation("AssignedCoordinator")
+  consultations     Consultation[]     @relation("ConsultationsByClinician")
+  vitalsRecords     VitalsRecord[]     @relation("VitalsRecordedBy")
+  auditLogs         AuditLog[]
+  taifaCareLinkages TaifaCareLinkage[]
+}
+
+model Patient {
+  id                    String        @id @default(cuid())
+  telemedicineId        String        @unique
+  taifacarePatientId    String?
+  shaPatientId          String?
+  hospitalPatientId     String?
+  nationalIdOrBirthCert String?
+  fullName              String
+  sex                   Sex
+  dateOfBirth           DateTime?
+  phone                 String
+  alternativePhone      String?
+  residence             String?
+  ward                  String?
+  villageOrEstate       String?
+  nearestLandmark       String?
+  enrollmentStatus      PatientStatus @default(PRE_ENROLLED)
+
+  createdById String?
+  createdBy   User?   @relation("PatientCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  queueEntries      QueueEntry[]
+  consultations     Consultation[]
+  vitalsRecords     VitalsRecord[]
+  taifacareLinkages TaifaCareLinkage[]
+}
+
+model TaifaCareLinkage {
+  id        String  @id @default(cuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  portalTelemedicineId String
+  taifacarePatientId   String
+  shaPatientId         String?
+  provider             String   @default("TaifaCare")
+  shaFacilityCode      String?
+  shaEnvironment       String?
+  dateLinked           DateTime @default(now())
+  linkedById           String?
+  linkedBy             User?    @relation(fields: [linkedById], references: [id])
+  matchingConfidence   Float?
+  matchingNotes        String?
+
+  createdAt DateTime @default(now())
+}
+
+model QueueEntry {
+  id        String  @id @default(cuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  assignedCoordinatorId String?
+  assignedCoordinator   User?   @relation("AssignedCoordinator", fields: [assignedCoordinatorId], references: [id])
+
+  assignedClinicianId String?
+  assignedClinician   User?   @relation("AssignedClinician", fields: [assignedClinicianId], references: [id])
+
+  reasonForContact String
+  contactMode      String
+  urgencyLevel     UrgencyLevel  @default(LOW)
+  status           QueueStatus   @default(WAITING)
+  patientStatus    PatientStatus @default(ACTIVE_VIRTUAL_CARE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Consultation {
+  id        String  @id @default(cuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  clinicianId                String?
+  clinician                  User?     @relation("ConsultationsByClinician", fields: [clinicianId], references: [id])
+  presentingComplaint        String?
+  historyNotes               String?
+  clinicalImpression         String?
+  diagnosis                  String?
+  adviceGiven                String?
+  prescriptionRecommendation String?
+  referralDecision           String?
+  followUpPlan               String?
+  nextAppointmentDate        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VitalsRecord {
+  id        String  @id @default(cuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  bloodPressureSystolic  Int?
+  bloodPressureDiastolic Int?
+  bloodGlucose           Float?
+  temperature            Float?
+  pulseRate              Int?
+  oxygenSaturation       Float?
+  weight                 Float?
+  muac                   Float?
+  symptoms               String?
+
+  recordedById String?
+  recordedBy   User?    @relation("VitalsRecordedBy", fields: [recordedById], references: [id])
+  recordedAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  action      String
+  entity      String
+  entityId    String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+
+  createdAt DateTime @default(now())
+}
