@@ -22,24 +22,41 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (!email || !validateEmail(email)) {
-      setError("Please enter a valid email");
+      setError("Please enter a valid email address.");
       return;
     }
+
     if (!password) {
-      setError("Password is required");
+      setError("Password is required.");
       return;
     }
 
     setLoading(true);
+
     try {
-      // TODO: Implement actual login
-      console.log("Login attempt:", { email, password });
-      // Redirect to dashboard on success
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result?.message || "Invalid email or password.");
+        return;
+      }
+
+      if (result.user) {
+        localStorage.setItem("mutuini_user", JSON.stringify(result.user));
+      }
+
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Unable to sign in at this time.");
     } finally {
       setLoading(false);
     }

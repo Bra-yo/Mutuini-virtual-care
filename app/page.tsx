@@ -40,33 +40,23 @@ export default function HomePage() {
           </Button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Phase 1 - Foundation Ready
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-10 text-left">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-5">
+            System Overview
           </h2>
-          <ul className="text-left space-y-3 text-gray-700">
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> Clean project structure
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> TypeScript & Tailwind CSS
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> Comprehensive type definitions
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> Reusable UI components
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> Service layer placeholders
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> Custom React hooks
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-600">✓</span> All module placeholders
-            </li>
-          </ul>
+          <p className="text-slate-600 mb-6">
+            Mutuini Virtual Care Portal supports hospital-led virtual care workflows designed to streamline patient management and clinical coordination.
+          </p>
+          <div className="grid gap-3 text-slate-700">
+            <div className="rounded-2xl bg-slate-50 p-4">Hospital-based patient registration</div>
+            <div className="rounded-2xl bg-slate-50 p-4">Virtual care queue management</div>
+            <div className="rounded-2xl bg-slate-50 p-4">Doctor assignment and consultation coordination</div>
+            <div className="rounded-2xl bg-slate-50 p-4">Community Health Promoter follow-up</div>
+            <div className="rounded-2xl bg-slate-50 p-4">Vitals monitoring and patient tracking</div>
+            <div className="rounded-2xl bg-slate-50 p-4">Alerts and escalation workflows</div>
+            <div className="rounded-2xl bg-slate-50 p-4">Reports, exports, and operational insight</div>
+            <div className="rounded-2xl bg-slate-50 p-4">SHA/TaifaCare readiness and integration support</div>
+          </div>
         </div>
       </div>
     </div>
