@@ -2,6 +2,7 @@
  * API Types
  * Request/response types for API operations
  */
+import type { ApiResponse, ApiErrorResponse } from "./common";
 
 export interface ApiRequestConfig {
   headers?: Record<string, string>;
@@ -19,12 +20,4 @@ export interface ApiClientOptions {
     response?: (response: ApiResponse) => ApiResponse;
     error?: (error: ApiErrorResponse) => void;
   };
-}
-
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  statusCode: number;
-  timestamp: string;
 }

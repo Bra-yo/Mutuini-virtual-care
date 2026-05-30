@@ -33,15 +33,26 @@ export const useFetch = <T,>(
   }, [fetchFn]);
 
   useEffect(() => {
-    if (options?.skip) return;
+  if (options?.skip) return;
 
+  const timeout = setTimeout(() => {
     refetch();
+  }, 0);
 
-    if (options?.refetchInterval) {
-      const interval = setInterval(refetch, options.refetchInterval);
-      return () => clearInterval(interval);
+  let interval: NodeJS.Timeout | undefined;
+
+  if (options?.refetchInterval) {
+    interval = setInterval(refetch, options.refetchInterval);
+  }
+
+  return () => {
+    clearTimeout(timeout);
+
+    if (interval) {
+      clearInterval(interval);
     }
-  }, [refetch, options?.skip, options?.refetchInterval]);
+  };
+}, [refetch, options?.skip, options?.refetchInterval]);
 
   return { data, loading, error, refetch };
 };

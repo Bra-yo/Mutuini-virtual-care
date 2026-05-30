@@ -95,7 +95,7 @@ export default function SettingsPage() {
               <p className="font-medium text-gray-900">Session Timeout</p>
               <p className="text-sm text-gray-600">Auto-logout after inactivity</p>
             </div>
-            <Input type="number" defaultValue="30" size="sm" className="w-20" />
+            <Input type="number" defaultValue={30} className="w-20" />
           </div>
           <Button variant="primary" onClick={handleSave}>
             Update Security Settings

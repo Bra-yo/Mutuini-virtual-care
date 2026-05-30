@@ -56,15 +56,16 @@ export const throttle = <T extends (...args: unknown[]) => unknown>(
   };
 };
 
-export const mergeObjects = <T extends Record<string, unknown>>(
-  ...objects: (T | undefined)[]
+export const mergeObjects = <T extends object>(
+  ...objects: (Partial<T> | undefined)[]
 ): T => {
-  return objects.reduce((acc, obj) => {
+  return objects.reduce<Partial<T>>((acc, obj) => {
     if (obj) {
       return { ...acc, ...obj };
     }
+
     return acc;
-  }, {} as T);
+  }, {}) as T;
 };
 
 export const groupBy = <T, K extends PropertyKey>(
